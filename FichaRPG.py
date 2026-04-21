@@ -1,12 +1,10 @@
 import customtkinter as ctk
 from pathlib import Path
 
-fichaPrincipal = Path(__file__).parent / "fichaPrincipal.txt"
-fichaSecundario = Path(__file__).parent / "fichaSec.txt"
+ficha = Path(__file__).parent / "ficha.txt"
 linhas = []
-informacoes_sec = False
 
-locais_principal = [
+locais = [
     'nome',
     'vida total',
     'vida atual',
@@ -25,36 +23,24 @@ locais_principal = [
     'furtividade'
 ]
 
-locais_secundario = [
-    'idade',
-    'raça',
-    'ilha inicial',
-    'poder inicial',
-    'emprego 1',
-    'emprego 2',
-    'dom'
-]
-
-#TODO, sistema para ver e fazer a ficha secundária
-
 def pegar_ficha():
-    with open(fichaPrincipal, 'r') as f:
+    with open(ficha, 'r') as f:
         linhas = f.readlines()
     return linhas
 
 def salvar_ficha():
-    with open(fichaPrincipal, 'w') as f:
+    with open(ficha, 'w') as f:
         for linha in linhas:
             f.write(linha)
     mostrar_atributos()
 
 def mostrar_atributos():
-    if len(linhas) < len(locais_principal):
+    if len(linhas) < len(locais):
         return
     for widget in frame_atributos.winfo_children():
         widget.destroy()
 
-    for i in range(len(locais_principal)):
+    for i in range(len(locais)):
         if (i == 0):
             label = ctk.CTkLabel(frame_atributos, text=linhas[i].strip(), font=("Arial", 20), anchor="w")
             label.pack(fill="x", pady=(0, 10))
@@ -69,7 +55,7 @@ def mostrar_atributos():
             continue
         if (i == 2 or i == 4):
             continue
-        label = ctk.CTkLabel(frame_atributos, text=locais_principal[i].capitalize() + ": " + linhas[i].strip(), anchor="w")
+        label = ctk.CTkLabel(frame_atributos, text=locais[i].capitalize() + ": " + linhas[i].strip(), anchor="w")
         label.pack(fill="x")
 
 def alterar_atributo_valor(atributo, valor):
@@ -85,7 +71,7 @@ def alterar_atributo(indice):
     janela.title("Alterar Atributo")
     janela.geometry("300x400")
     janela.grab_set()
-    label = ctk.CTkLabel(janela, text=locais_principal[indice].capitalize() + ": " + linhas[indice].strip(), anchor="w")
+    label = ctk.CTkLabel(janela, text=locais[indice].capitalize() + ": " + linhas[indice].strip(), anchor="w")
     label.pack(pady=10, fill="x", padx=10)
     entrada = ctk.CTkEntry(janela, placeholder_text="Valor")
     entrada.pack(pady=10)
@@ -104,7 +90,7 @@ def editar_ficha_toda():
     scroll.pack(fill="both", expand=True, padx=10)
 
     entries = []
-    for i, campo in enumerate(locais_principal):
+    for i, campo in enumerate(locais):
         label = ctk.CTkLabel(scroll, text=campo.capitalize())
         label.pack(anchor="w")
 
@@ -116,7 +102,7 @@ def editar_ficha_toda():
         entries.append(entry)
     def salvar():
         global linhas
-        with open(fichaPrincipal, 'w') as f:
+        with open(ficha, 'w') as f:
             for entry in entries:
                 f.write(entry.get() + '\n')
         linhas = pegar_ficha()
@@ -126,7 +112,7 @@ def editar_ficha_toda():
     botao_ok = ctk.CTkButton(janela, text="OK", command=salvar)
     botao_ok.pack(pady=10)
 
-if Path(fichaPrincipal).is_file():
+if Path(ficha).is_file():
     linhas = pegar_ficha()   
 
 ctk.set_appearance_mode("System")
@@ -159,9 +145,9 @@ botao_sanidade.pack(pady=10)
 frame_mudar_atributo = ctk.CTkFrame(frame_controles, border_width=2, border_color="gray")
 frame_mudar_atributo.pack(pady=10, padx=10, ipadx=10, ipady=10)
 ctk.CTkLabel(frame_mudar_atributo, text="Alterar Atributo", anchor="w").pack(pady=(5, 0), fill="x", padx=10)
-selecao = ctk.CTkOptionMenu(frame_mudar_atributo, values=locais_principal)
+selecao = ctk.CTkOptionMenu(frame_mudar_atributo, values=locais)
 selecao.pack(pady=10)
-mudar_atributo_button = ctk.CTkButton(frame_mudar_atributo, text="Mudar Atributo", command=lambda: alterar_atributo(locais_principal.index(selecao.get())))
+mudar_atributo_button = ctk.CTkButton(frame_mudar_atributo, text="Mudar Atributo", command=lambda: alterar_atributo(locais.index(selecao.get())))
 mudar_atributo_button.pack(pady=10)
 
 frame_mudar_ficha_toda = ctk.CTkFrame(frame_controles, border_width=2, border_color="gray")
@@ -172,9 +158,9 @@ botao_mudar_ficha.pack(pady=10)
 
 frame_controles.pack(pady=20, padx=(10, 20), fill="both", expand=True, side="left")
 
-if (Path(fichaPrincipal).is_file() == False):
+if (Path(ficha).is_file() == False):
     editar_ficha_toda()
-elif len(linhas) >= len(locais_principal):
+elif len(linhas) >= len(locais):
     mostrar_atributos()
 
 app.mainloop()
